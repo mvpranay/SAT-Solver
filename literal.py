@@ -7,3 +7,6 @@ class Literal:
     def assign(self, value : bool):
         self.assigned = True
         self.value = value
+
+    def isPositive(self):
+        return self.label > 0
