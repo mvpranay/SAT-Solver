@@ -1,18 +1,29 @@
 #include "clause.h"
 #include <string>
-#include <string>
 
 class Solver{
+    // pointers to clauses
+    std::vector<Clause *> clauses;
+    // only positive versions
+    std::set<int> labels;
+    std::shared_ptr<std::map<int, Literal>> literals;
+
+    bool done;
+    
+    // literal -> level at which it was assigned    
+    std::map<int, int> decision_level;
+
+    int current_decision_level = 0;
+
+    // stores what decision
+    std::map<int, std::set<int>> decision_sources;
+
+    std::string result;
+
 public:
     Solver(){
         done = false;
         literals = std::make_shared<std::map<int, Literal>>();
-    }
-
-    ~Solver(){
-        for (Clause * c : clauses){
-            delete c;
-        }
     }
 
     ~Solver(){
@@ -41,7 +52,6 @@ public:
             }
 
             new_clause->addAtom(atom);
-            new_clause->addAtom(atom);
         }
 
         clauses.push_back(new_clause);
@@ -51,7 +61,6 @@ public:
     int getUnitClause(){
         int nclauses = clauses.size();
         for (int i = 0; i < nclauses; i++){
-            if (clauses[i]->isUnitClause())
             if (clauses[i]->isUnitClause())
                 return i;
         }
@@ -78,46 +87,21 @@ public:
         }
     }
 
-    // check if all clauses have been assigned the value true
-    bool allClausesSatisfied(){
-        for (Clause * c : clauses){
-            if (c->assigned == false || c->value == false)
-                return false;
-        }
-        return true;
-    }
-
-    void makeDecision(){
-        for (auto & literal_pair : * literals){
-            if (literal_pair.second.assigned == false){
-                assignLiteral(literal_pair.first, true);
-                current_decision_level++;
-                return;
-            }
-        }
-    }
-
     // assigns the literal to the value in every clause, and recalculates status
     void assignLiteral(int label, bool value){
-        Literal & L = (*literals)[label];
         Literal & L = (*literals)[label];
         L.assign(value);
 
         for (Clause * c : clauses){
             c->assignAtom(label);
             c->recalculateStatus();
-        for (Clause * c : clauses){
-            c->assignAtom(label);
-            c->recalculateStatus();
         }
 
-        decision_level[label] = current_decision_level;
         decision_level[label] = current_decision_level;
         return;
     }
 
     void deassignLiteral(int label){
-        Literal & L = (*literals)[label];
         Literal & L = (*literals)[label];
         L.deassign();
 
@@ -238,35 +222,4 @@ public:
             makeDecision();
         }
     }
-
-private:
-    // pointers to clauses
-    std::vector<Clause *> clauses;
-    // pointers to clauses
-    std::vector<Clause *> clauses;
-    // only positive versions
-    std::set<int> labels;
-    std::shared_ptr<std::map<int, Literal>> literals;
-
-    bool done;
-    
-    // literal -> level at which it was assigned    
-    std::map<int, int> decision_level;
-
-    int current_decision_level = 0;
-
-    // stores what decision
-    std::map<int, std::set<int>> decision_sources;
-
-    std::string result;
-    // literal -> level at which it was assigned    
-    std::map<int, int> decision_level;
-
-    int current_decision_level = 0;
-
-    // stores what decision
-    std::map<int, std::set<int>> decision_sources;
-
-    std::string result;
-
 };
