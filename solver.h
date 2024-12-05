@@ -4,12 +4,13 @@
 class Solver{
     // pointers to clauses
     std::vector<Clause *> clauses;
+
     // only positive versions
     std::set<int> labels;
+    
+    // positive label -> Literal object
     std::shared_ptr<std::map<int, Literal>> literals;
 
-    bool done;
-    
     // literal -> level at which it was assigned    
     std::map<int, int> decision_level;
 
@@ -20,9 +21,10 @@ class Solver{
 
 public:
     std::string result;
+
     Solver(){
-        done = false;
         literals = std::make_shared<std::map<int, Literal>>();
+        result = "TBD";
     }
 
     ~Solver(){
@@ -31,8 +33,8 @@ public:
         }
     }
 
+    // inputs and a vector and adds it as a clause in the CNF Formula
     void addClause(std::vector<int> atoms){
-        // Clause new_clause(literals);
         int size = atoms.size();
         
         // don't allow addition of an empty class
@@ -76,6 +78,7 @@ public:
         return true;
     }
 
+    // makes a decision to progress if there are no more unit clauses
     void makeDecision(){
         for (auto & literal_pair : * literals){
             if (literal_pair.second.assigned == false){
@@ -100,6 +103,7 @@ public:
         return;
     }
 
+    // deassigns the literal in every clause, and recalculates status
     void deassignLiteral(int label){
         Literal & L = (*literals)[label];
         L.deassign();
@@ -108,9 +112,9 @@ public:
             c->deassignAtom(label);
             c->recalculateStatus();
         }
-        // decision_level.erase(label); 
     }
 
+    // backtracks to the decision level by reverting all decisions with level > backtrack_level
     void backtrack(int backtrack_level){
         // erase all assignments with level > backtrack_level
         std::set<int> to_deassign;
@@ -132,6 +136,7 @@ public:
         current_decision_level = backtrack_level;
     }
 
+    // tries to learn a clause when a conflict is reached, returns nullptr otherwise
     Clause * analyzeConflict(Clause * conflict_clause){
         std::set<int> learnt_atoms;
 
@@ -152,8 +157,9 @@ public:
         return learnt_clause;
     }
 
+    // checks if given CNF formula is satisfiable, and stores in result
     void checkSAT(){
-        while (done == false){
+        while (true){
             // assign the unit clauses
             int index_unit_clause = getUnitClause();
 
@@ -171,8 +177,6 @@ public:
                 }
 
                 // set decision_sources
-                // decision_sources[unassigned].clear();
-                
                 for (int atom : clauses[index_unit_clause]->atoms){
                     if (atom != unassigned){
                         decision_sources[unassigned].insert(decision_sources[atom].begin(), decision_sources[atom].end());
@@ -189,7 +193,6 @@ public:
                         Clause * learnt_clause = analyzeConflict(c);
 
                         if (learnt_clause == nullptr){
-                            done = true;
                             result = "UNSAT";
                             return;
                         }
@@ -214,7 +217,6 @@ public:
             }  
 
             if (allClausesSatisfied()){
-                done = true;
                 result = "SAT";
                 return;
             }

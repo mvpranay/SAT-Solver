@@ -5,20 +5,24 @@ int main() {
     // Create a Solver instance
     Solver solver;
 
-    // Add some test clauses
-    std::cout << "Adding test clauses..." << std::endl;
+    // Take Input from User
+    std::cout << "Enter number of clauses : ";
+    int nclauses; 
+    std::cin >> nclauses;
 
-    // Clause 1: x1 OR x2
-    solver.addClause({1, 2}); // {1,2}
+    for (int i = 0; i < nclauses; i++){
+        std::cout << "Enter number of literals in clause : ";
+        int nliterals;
+        std::cin >> nliterals;
 
-    // Clause 2: NOT x1 OR x3
-    solver.addClause({-1, 2}); // {-1, 3}
+        std::cout << "Enter the literals in clause : ";
+        std::vector<int> clause(nliterals);
+        for (int i = 0; i < nliterals; i++)
+            std::cin >> clause[i];
 
-    // Clause 3: NOT x2 OR NOT x3
-    solver.addClause({1, -2}); // {-2, -3}
-
-    // Clause 4: x1
-    solver.addClause({-1, -2}); // {1}
+        solver.addClause(clause);
+        std::cout << "------------------------------------------" << std::endl;
+    } 
 
     // Print initial state
     std::cout << "Checking SAT..." << std::endl;
