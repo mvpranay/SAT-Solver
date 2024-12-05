@@ -18,9 +18,8 @@ class Solver{
     // stores what decision
     std::map<int, std::set<int>> decision_sources;
 
-    std::string result;
-
 public:
+    std::string result;
     Solver(){
         done = false;
         literals = std::make_shared<std::map<int, Literal>>();
@@ -182,6 +181,7 @@ public:
 
                 // recalculate status and check if any clause was assigned false
                 for (Clause * c : clauses){
+                    c->assignAtom(unassigned);
                     c->recalculateStatus();
 
                     // conflict here
