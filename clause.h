@@ -8,6 +8,7 @@ class Clause{
 public:
     bool assigned;
     bool value;
+    std::set<int> atoms;
     
     Clause(std::shared_ptr<std::map<int, Literal>> __literals){
         assigned = false;
@@ -30,7 +31,7 @@ public:
     }
 
     // to assign an unassigned atom
-    void assignAtom(int label, bool value){
+    void assignAtom(int label){
         bool label_present = atoms.contains(label);
         bool neglabel_present = atoms.contains(-label);
 
@@ -104,7 +105,6 @@ public:
     }
 
 private:
-    std::set<int> atoms;
     std::set<int> unassigned_atoms;
     std::shared_ptr<std::map<int, Literal>> literals;
 };
