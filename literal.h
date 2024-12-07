@@ -3,17 +3,9 @@ struct Literal{
     bool assigned;
     bool value;
 
-    Literal() : label(0){}
-
     Literal(int __label){
         label = __label;
         assigned = false;
-    }
-
-    Literal(const Literal & other){
-        label = other.label;
-        assigned = other.assigned;
-        value = other.value;
     }
 
     void assign(bool __value){
