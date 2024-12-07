@@ -8,8 +8,8 @@ class Solver{
     // only positive versions
     std::set<int> labels;
     
-    // positive label -> Literal object
-    std::shared_ptr<std::map<int, Literal>> literals;
+    // positive label -> pointer to Literal object
+    std::shared_ptr<std::map<int, Literal *>> literals;
 
     // literal -> level at which it was assigned    
     std::map<int, int> decision_level;
@@ -23,13 +23,17 @@ public:
     std::string result;
 
     Solver(){
-        literals = std::make_shared<std::map<int, Literal>>();
+        literals = std::make_shared<std::map<int, Literal *>>();
         result = "TBD";
     }
 
     ~Solver(){
         for (Clause * c : clauses){
             delete c;
+        }
+
+        for (int label : labels){
+            delete (*literals)[label];
         }
     }
 
@@ -49,7 +53,8 @@ public:
             // found a new literal
             if (labels.contains(pos) == false){
                 labels.insert(pos);
-                literals->emplace(pos, Literal(pos));
+                Literal * new_literal = new Literal(pos);
+                literals->emplace(pos, new_literal);
             }
 
             new_clause->addAtom(atom);
@@ -81,7 +86,7 @@ public:
     // makes a decision to progress if there are no more unit clauses
     void makeDecision(){
         for (auto & literal_pair : * literals){
-            if (literal_pair.second.assigned == false){
+            if (literal_pair.second->assigned == false){
                 assignLiteral(literal_pair.first, true);
                 current_decision_level++;
                 return;
@@ -91,8 +96,8 @@ public:
 
     // assigns the literal to the value in every clause, and recalculates status
     void assignLiteral(int label, bool value){
-        Literal & L = (*literals)[label];
-        L.assign(value);
+        Literal * L = (*literals)[label];
+        L->assign(value);
 
         for (Clause * c : clauses){
             c->assignAtom(label);
@@ -105,8 +110,8 @@ public:
 
     // deassigns the literal in every clause, and recalculates status
     void deassignLiteral(int label){
-        Literal & L = (*literals)[label];
-        L.deassign();
+        Literal * L = (*literals)[label];
+        L->deassign();
 
         for (Clause * c : clauses){
             c->deassignAtom(label);
@@ -169,11 +174,11 @@ public:
 
                 // need to assign true to make clause true
                 if (unassigned > 0){
-                    (*literals)[unassigned].assign(true);
+                    (*literals)[unassigned]->assign(true);
                 }
                 // need to assign false to make clause true
                 else{
-                    (*literals)[-unassigned].assign(false);
+                    (*literals)[-unassigned]->assign(false);
                 }
 
                 // set decision_sources

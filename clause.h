@@ -10,7 +10,7 @@ public:
     bool value;
     std::set<int> atoms;
     
-    Clause(std::shared_ptr<std::map<int, Literal>> __literals){
+    Clause(std::shared_ptr<std::map<int, Literal *>> __literals){
         assigned = false;
         literals = __literals;
     }
@@ -72,16 +72,16 @@ public:
 
         for (int atom : atoms){
             int pos = (atom > 0) ? atom : -atom;
-            Literal L = (*literals)[pos];
+            Literal * L = (*literals)[pos];
 
             // if the literal is unassigned, continue search for a positive atom
-            if (L.assigned == false){
+            if (L->assigned == false){
                 all_assigned = false;
                 continue;
             }
 
             // if atom has been assigned to true, we are done
-            if ((L.value == true && atom > 0) || (L.value == false && atom < 0)){
+            if ((L->value == true && atom > 0) || (L->value == false && atom < 0)){
                 true_atom_present = true;
                 break;
             }
@@ -106,5 +106,5 @@ public:
 
 private:
     std::set<int> unassigned_atoms;
-    std::shared_ptr<std::map<int, Literal>> literals;
+    std::shared_ptr<std::map<int, Literal *>> literals;
 };
