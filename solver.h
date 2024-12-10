@@ -229,4 +229,13 @@ public:
             makeDecision();
         }
     }
+
+    // return the satisfying assignment as a string
+    std::string printAssignment(){
+        std::string assignment = "";
+        for (auto & literal_pair : * literals){
+            assignment += "Literal " + std::to_string(literal_pair.first) + " : " + ((literal_pair.second->assigned) ? std::to_string(literal_pair.second->value) : "0") + "\n";
+        }
+        return assignment;
+    }
 };

@@ -33,5 +33,11 @@ int main() {
     // Display result
     std::cout << "Result: " << solver.result << std::endl;
 
+    std::cout << "------------------------------------------" << std::endl;
+
+    if (solver.result == "SAT"){
+        std::cout << solver.printAssignment() << std::endl;
+    }
+
     return 0;
 }
